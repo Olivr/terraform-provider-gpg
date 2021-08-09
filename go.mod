@@ -1,8 +1,9 @@
-module github.com/hashicorp/terraform-provider-scaffolding
+module github.com/Olivr/terraform-provider-gpg
 
-go 1.15
+go 1.16
 
 require (
+	github.com/ProtonMail/gopenpgp/v2 v2.2.2
 	github.com/hashicorp/terraform-plugin-docs v0.4.0
-	github.com/hashicorp/terraform-plugin-sdk/v2 v2.6.1
+	github.com/hashicorp/terraform-plugin-sdk/v2 v2.7.0
 )
