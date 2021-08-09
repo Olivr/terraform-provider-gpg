@@ -11,19 +11,6 @@ The GPG provider provides resources to generate a private/public key pair.
 
 ## Example Usage
 
-```terraform
-terraform {
-  required_providers {
-    gpg = {
-      source = "Olivr/gpg"
-    }
-  }
-}
-```
+{{tffile "examples/provider/provider.tf"}}
 
-```terraform
-resource "gpg_private_key" "key" {
-  name  = "John Doe"
-  email = "john@doe.com"
-}
-```
+{{tffile "examples/resources/gpg_private_key/resource.tf"}}

@@ -3,12 +3,12 @@
 page_title: "gpg_private_key Resource - terraform-provider-gpg"
 subcategory: ""
 description: |-
-  The resource private_key generates a GPG private/public key pair.
+  The resource private_key generates a GPG private/public key pair in ASCII-armored format.
 ---
 
 # gpg_private_key (Resource)
 
-The resource `private_key` generates a GPG private/public key pair.
+The resource `private_key` generates a GPG private/public key pair in ASCII-armored format.
 
 ## Example Usage
 
@@ -30,12 +30,12 @@ resource "gpg_private_key" "key" {
 ### Optional
 
 - **id** (String) The ID of this resource.
-- **rsa_bits** (Number) Number of bits to use when generating RSA key
+- **rsa_bits** (Number) Number of bits to use when generating RSA key.
 
 ### Read-Only
 
-- **fingerprint** (String)
-- **private_key** (String, Sensitive)
-- **public_key** (String)
+- **fingerprint** (String) Public key fingerprint.
+- **private_key** (String, Sensitive) Generated private key in ASCII-armored format.
+- **public_key** (String) Generated public key in ASCII-armored format.
 
 

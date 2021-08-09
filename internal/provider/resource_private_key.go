@@ -11,7 +11,7 @@ import (
 func resourcePrivateKey() *schema.Resource {
 	return &schema.Resource{
 		// This description is used by the documentation generator and the language server.
-		Description:   "The resource `private_key` generates a GPG private/public key pair.",
+		Description:   "The resource `private_key` generates a GPG private/public key pair in ASCII-armored format.",
 		CreateContext: resourcePrivateKeyCreate,
 		ReadContext:   resourcePrivateKeyRead,
 		DeleteContext: resourcePrivateKeyDelete,
@@ -34,25 +34,28 @@ func resourcePrivateKey() *schema.Resource {
 			"rsa_bits": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Description: "Number of bits to use when generating RSA key",
+				Description: "Number of bits to use when generating RSA key.",
 				ForceNew:    true,
 				Default:     4096,
 			},
 
 			"private_key": {
-				Type:      schema.TypeString,
-				Computed:  true,
-				Sensitive: true,
+				Type:        schema.TypeString,
+				Description: "Generated private key in ASCII-armored format.",
+				Computed:    true,
+				Sensitive:   true,
 			},
 
 			"public_key": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "Generated public key in ASCII-armored format.",
+				Computed:    true,
 			},
 
 			"fingerprint": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "Public key fingerprint.",
+				Computed:    true,
 			},
 		},
 	}
