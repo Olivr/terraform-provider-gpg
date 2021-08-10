@@ -11,7 +11,7 @@ import (
 func resourcePrivateKey() *schema.Resource {
 	return &schema.Resource{
 		// This description is used by the documentation generator and the language server.
-		Description:   "The resource `private_key` generates a GPG private/public key pair in ASCII-armored format.",
+		Description:   "The resource `gpg_private_key` generates a GPG private/public key pair in ASCII-armored format.",
 		CreateContext: resourcePrivateKeyCreate,
 		ReadContext:   resourcePrivateKeyRead,
 		DeleteContext: resourcePrivateKeyDelete,
