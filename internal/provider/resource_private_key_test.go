@@ -9,6 +9,19 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
+const testAccResourcePrivateKey = `
+resource "gpg_private_key" "key_1" {
+	name = "test"
+	email = "test@test.com"
+}
+resource "gpg_private_key" "key_2" {
+	name = "test"
+	email = "test@test.com"
+	passphrase = "this is not a secure passphrase"
+	rsa_bits = 3072
+}
+`
+
 func TestAccResourcePrivateKey(t *testing.T) {
 	resource.UnitTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -17,14 +30,20 @@ func TestAccResourcePrivateKey(t *testing.T) {
 			{
 				Config: testAccResourcePrivateKey,
 				Check: resource.ComposeTestCheckFunc(
-					testAccResourceCreateRsaBits("gpg_private_key.key_1", 2048),
+					testAccResourceCreateKey("gpg_private_key.key_1", ""),
+				),
+			},
+			{
+				Config: testAccResourcePrivateKey,
+				Check: resource.ComposeTestCheckFunc(
+					testAccResourceCreateKey("gpg_private_key.key_2", "this is not a secure passphrase"),
 				),
 			},
 		},
 	})
 }
 
-func testAccResourceCreateRsaBits(id string, rsa_bits int) resource.TestCheckFunc {
+func testAccResourceCreateKey(id string, passphrase string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[id]
 		if !ok {
@@ -40,6 +59,13 @@ func testAccResourceCreateRsaBits(id string, rsa_bits int) resource.TestCheckFun
 			return err
 		}
 
+		if passphrase != "" {
+			privateKeyObj, err = privateKeyObj.Unlock([]byte(passphrase))
+			if err != nil {
+				return err
+			}
+		}
+
 		signingKeyRing, err := crypto.NewKeyRing(privateKeyObj)
 		if err != nil {
 			return err
@@ -52,10 +78,3 @@ func testAccResourceCreateRsaBits(id string, rsa_bits int) resource.TestCheckFun
 		return nil
 	}
 }
-
-const testAccResourcePrivateKey = `
-resource "gpg_private_key" "key_1" {
-	name = "test"
-	email = "test@test.com"
-}
-`

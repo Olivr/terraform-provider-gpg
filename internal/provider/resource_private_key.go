@@ -31,6 +31,14 @@ func resourcePrivateKey() *schema.Resource {
 				ForceNew:    true,
 			},
 
+			"passphrase": {
+				Description: "Passphrase protecting the private key.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				ForceNew:    true,
+				Sensitive:   true,
+			},
+
 			"rsa_bits": {
 				Type:        schema.TypeInt,
 				Optional:    true,
@@ -68,10 +76,18 @@ func resourcePrivateKeyCreate(ctx context.Context, d *schema.ResourceData, meta 
 	rsa_bits := d.Get("rsa_bits").(int)
 	name := d.Get("name").(string)
 	email := d.Get("email").(string)
+	passphrase := d.Get("passphrase").(string)
 
 	key, err := crypto.GenerateKey(name, email, "rsa", rsa_bits)
 	if err != nil {
 		return diag.FromErr(err)
+	}
+
+	if passphrase != "" {
+		key, err = key.Lock([]byte(passphrase))
+		if err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
 	publicKey, err := key.GetArmoredPublicKey()
