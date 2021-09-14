@@ -44,7 +44,7 @@ func resourcePrivateKey() *schema.Resource {
 				Optional:    true,
 				Description: "Number of bits to use when generating RSA key.",
 				ForceNew:    true,
-				Default:     4096,
+				Default:     2048,
 			},
 
 			"private_key": {
