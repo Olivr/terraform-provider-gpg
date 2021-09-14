@@ -10,15 +10,25 @@ import (
 )
 
 const testAccResourcePrivateKey = `
-resource "gpg_private_key" "key_1" {
+resource "gpg_private_key" "key" {
 	name = "test"
 	email = "test@test.com"
 }
-resource "gpg_private_key" "key_2" {
+`
+
+const testAccResourcePrivateKeyRsaBits = `
+resource "gpg_private_key" "key" {
+	name = "test"
+	email = "test@test.com"
+	rsa_bits = 3072
+}
+`
+
+const testAccResourcePrivateKeyPassphrase = `
+resource "gpg_private_key" "key" {
 	name = "test"
 	email = "test@test.com"
 	passphrase = "this is not a secure passphrase"
-	rsa_bits = 3072
 }
 `
 
@@ -30,20 +40,26 @@ func TestAccResourcePrivateKey(t *testing.T) {
 			{
 				Config: testAccResourcePrivateKey,
 				Check: resource.ComposeTestCheckFunc(
-					testAccResourceCreateKey("gpg_private_key.key_1", ""),
+					testAccResourceCreateKey("gpg_private_key.key", 2048, ""),
 				),
 			},
 			{
-				Config: testAccResourcePrivateKey,
+				Config: testAccResourcePrivateKeyRsaBits,
 				Check: resource.ComposeTestCheckFunc(
-					testAccResourceCreateKey("gpg_private_key.key_2", "this is not a secure passphrase"),
+					testAccResourceCreateKey("gpg_private_key.key", 3072, ""),
+				),
+			},
+			{
+				Config: testAccResourcePrivateKeyPassphrase,
+				Check: resource.ComposeTestCheckFunc(
+					testAccResourceCreateKey("gpg_private_key.key", 2048, "this is not a secure passphrase"),
 				),
 			},
 		},
 	})
 }
 
-func testAccResourceCreateKey(id string, passphrase string) resource.TestCheckFunc {
+func testAccResourceCreateKey(id string, rsaBits uint16, passphrase string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[id]
 		if !ok {
@@ -57,6 +73,14 @@ func testAccResourceCreateKey(id string, passphrase string) resource.TestCheckFu
 		privateKeyObj, err := crypto.NewKeyFromArmored(rs.Primary.Attributes["private_key"])
 		if err != nil {
 			return err
+		}
+
+		keyLength, err := privateKeyObj.GetEntity().PrimaryKey.BitLength()
+		if err != nil {
+			return err
+		}
+		if keyLength != rsaBits {
+			return fmt.Errorf("The length of the generated key (%d) doesn't match with the length requested in the Terraform configuration (%d).", keyLength, rsaBits)
 		}
 
 		if passphrase != "" {
