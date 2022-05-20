@@ -1,6 +1,6 @@
 # GPG Terraform Provider
 
-This provider lets you generate a GPG key pair.
+This provider lets you generate a PGP key pair.
 
 ## Using the provider
 
